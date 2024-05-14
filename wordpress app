@@ -1,0 +1,91 @@
+Prerequisites:
+
+- Have a CentOS server up and running
+- Install Docker on the server. Use this link for installation if necessary. https://dataservicegroup.atlassian.net/wiki/spaces/LAT/pages/2157543425/Docker+Installation+on+Centos+and+Ubuntu
+
+- Install docker-compose. Use this Link for the installation.https://dataservicegroup.atlassian.net/wiki/spaces/LAT/pages/2224488511/Install+Docker+compose+on+Centos+7?atlOrigin=eyJpIjoiZGI0NWRhODVlZTk1NDZhNjkyNjM5MDc0YTQ1NWY3YzIiLCJwIjoiYyJ9
+
+- Connect remotely to the server as a regular user with root privileges. The user must also have access to docker commands (the user must belong to the docker group)
+
+
+                        OR
+Install with Terraform
+
+- Terraform must be installed. Use this link if not installed https://dataservicegroup.atlassian.net/wiki/spaces/AT/pages/2178187331/Install+Terraform+on+Windows+and+MacOS
+
+- AWS CLI must be installed. Refer to AWS folder for installation and configuration.
+
+- Create a new directory, DevOpsLab. Our projects and labs will be created in this directory from here on.
+mkdir DevOpsLab
+
+- Navigate to the directory
+cd DevOpsLab
+
+- Now create a directory Docker where we will use to create all the docker labs and projects.
+mkdir Docker
+
+- Now move into the directory
+cd Docker
+
+- clone the code from GitHub
+git clone https://github.com/utrains/docker-Lab.git
+
+- Once the cloning is completed, move into the docker-Lab directory
+cd docker-Lab
+
+
+                                        CREATE WITH DOCKER-COMPOSE
+
+- create a folder for the project
+cd ~
+mkdir docker-compose-wordpress
+cd docker-compose-wordpress
+
+- In this folder, let’s create the docker-compose.yml file
+vi docker-compose.yml
+
+- The content of the file should look like the following: (copy and paste in the file)
+
+version: '3'
+services:
+  wordpress:
+    depends_on:
+        - mysql
+    image: wordpress:4.9.4-php7.2-apache
+    #container_name: wordpress
+    restart: always
+    environment:
+        - WORDPRESS_DB_USER=root
+        - WORDPRESS_DB_PASSWORD=db_password
+        - WORDPRESS_DB_HOST=mysql
+        - WORDPRESS_DB_NAME=webserver
+    ports:
+        - 8061:80
+    networks:
+        - web
+    volumes:
+        - wordpressdata:/var/www/html
+  mysql:
+    image: mariadb:10.4.12
+    #container_name: db
+    environment: 
+        - MYSQL_ROOT_PASSWORD=db_password
+        - MYSQL_USER=wp_user
+        - MYSQL_PASSWORD=wp_password
+        - MYSQL_DATABASE= webserver
+    networks:
+        - web
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+        - database:/var/lib/mysql
+networks:
+    web:
+      driver: bridge
+volumes:
+    wordpressdata:
+    database:
+
+- Save and exit the file
+
+- Run the the wordpress application
+docker-compose up -d`
